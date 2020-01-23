@@ -16,7 +16,7 @@ type calcVisitor struct {
 }
 
 func (v *calcVisitor) VisitJson(ctx *parser.JsonContext) interface{} {
-	return v.VisitValue(ctx.Value().GetRuleContext().(*parser.ValueContext))
+	return v.VisitElement(ctx.Element().GetRuleContext().(*parser.ElementContext))
 }
 
 func (v *calcVisitor) VisitObj(ctx *parser.ObjContext) interface{} {
