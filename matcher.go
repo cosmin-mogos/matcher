@@ -21,11 +21,23 @@ func (cl *calcListener) EnterValue(c *parser.ValueContext) {
 	//fmt.Println(top.Type().Kind() == reflect.Int)
 	switch {
 	case c.NUMBER() != nil:
-		//FIXME handle all int types
-		expected, _ := strconv.ParseInt(c.NUMBER().GetText(), 10, 64)
+		//FIXME handle all number types
+		expected, err := strconv.ParseInt(c.NUMBER().GetText(), 10, 64)
+		if err == nil {
+			cl.failed = cl.failed || cl.v.Top().Type().Kind() != reflect.Int || cl.v.Top().Int() != expected
+		}
+
+		expectedFloat, err := strconv.ParseFloat(c.NUMBER().GetText(), 64)
+		if err == nil {
+			cl.failed = cl.failed || cl.v.Top().Type().Kind() != reflect.Int || cl.v.Top().Float() != expectedFloat
+		}
+
+		if err != nil {
+			panic("Could not handle NUMBER")
+		}
 		//fmt.Println("exp", expected, "|", c.NUMBER().GetText())
 		//fmt.Println("real", cl.stack.Top().Int())
-		cl.failed = cl.failed || cl.v.Top().Type().Kind() != reflect.Int || cl.v.Top().Int() != expected
+
 		//fmt.Println(cl.failed)
 	case c.STRING() != nil:
 		expected := stripQuotes(c.STRING())

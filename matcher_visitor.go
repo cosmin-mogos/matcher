@@ -72,16 +72,34 @@ func (v *calcVisitor) VisitValue(ctx *parser.ValueContext) interface{} {
 			//FIXME handle all int types
 			rv := v.(reflect.Value)
 
-			expected, err := strconv.ParseInt(ctx.NUMBER().GetText(), 10, 64)
-			if err != nil {
-				panic(fmt.Errorf("failed to parse \"%s\": %v", ctx.NUMBER().GetText(), err))
+			switch rv.Type().Kind() {
+			case reflect.Int:
+				return rv.Int() == parseInt(ctx.NUMBER())
+			case reflect.Float64:
+				return rv.Float() == parseFloat64(ctx.NUMBER())
 			}
 
-			return rv.Type().Kind() == reflect.Int && rv.Int() == expected
+			panic("Unhandled NUMBER " + ctx.NUMBER().GetText())
 		})
 	default:
 		panic("NOT IMPLEMENTED")
 	}
+}
+
+func parseFloat64(number antlr.TerminalNode) float64 {
+	expected, err := strconv.ParseFloat(number.GetText(), 64)
+	if err != nil {
+		panic(fmt.Errorf("failed to parse \"%s\": %v", number.GetText(), err))
+	}
+	return expected
+}
+
+func parseInt(number antlr.TerminalNode) int64 {
+	expected, err := strconv.ParseInt(number.GetText(), 10, 64)
+	if err != nil {
+		panic(fmt.Errorf("failed to parse \"%s\": %v", number.GetText(), err))
+	}
+	return expected
 }
 
 func (v *calcVisitor) VisitTemplate(ctx *parser.TemplateContext) interface{} {

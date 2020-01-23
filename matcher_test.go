@@ -10,6 +10,23 @@ type test2 struct {
 	a string
 }
 
+type leg struct {
+	distance float64
+	duration float64
+	steps    *string
+}
+
+type route struct {
+	distance float64
+	duration float64
+	geometry string
+	legs     []leg
+}
+
+type directions struct {
+	routes []route
+}
+
 func TestSuccess(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -52,6 +69,41 @@ func TestSuccess(t *testing.T) {
 				a []string
 			}{
 				a: []string{"string"},
+			},
+		},
+		{
+			name: "complex example",
+			template: `{
+				"routes": [
+					{
+						"distance": 2287.5,
+						"duration": 351,
+						"geometry": ?,
+						"legs": [
+							{
+								"distance": ?,
+								"duration": 351,
+								"steps": *
+							}
+						]
+					}
+				]
+			}`,
+			value: directions{
+				routes: []route{
+					{
+						distance: 2287.6,
+						duration: 351,
+						geometry: "234JaRbMeKuRxImGqEqIzYaSzFrK",
+						legs: []leg{
+							{
+								distance: 132,
+								duration: 351,
+								steps:    nil,
+							},
+						},
+					},
+				},
 			},
 		},
 	}
